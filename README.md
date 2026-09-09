@@ -17,6 +17,7 @@ MindmapChat 是一款创新的 AI 对话工具，将传统线性对话以**思�
 - **网页端**：React 19 + Vite，浏览器直接访问
 - **桌面端**：Electron 跨平台客户端（macOS / Windows / Linux），与网页端共用同一服务端数据
 - **多服务商**：内置阿里云百炼、腾讯混元，基于 OpenAI 兼容协议可扩展
+- **在线体验**：[www.mindmapchat.online](http://www.mindmapchat.online/)（公网测试实例，数据可能随版本重置，请勿存放敏感信息）
 
 ## ✨ 核心特性
 
