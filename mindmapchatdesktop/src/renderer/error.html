@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self';" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindmapChat 暂时无法连接</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="error-page">
+    <main class="error-card">
+      <div class="brand-mark large" aria-hidden="true"><span></span><span></span><span></span></div>
+      <p class="eyebrow">MINDMAPCHAT DESKTOP</p>
+      <h1>暂时无法连接</h1>
+      <p class="lead">请检查网络或服务器地址，然后重新连接。</p>
+      <div class="connection-detail">
+        <span>当前服务器</span>
+        <strong id="server-url">—</strong>
+        <small id="error-message"></small>
+      </div>
+      <div class="actions centered">
+        <button id="settings-button" class="button secondary" type="button">服务器设置</button>
+        <button id="retry-button" class="button primary" type="button">重新连接</button>
+      </div>
+      <p id="retry-message" class="message" aria-live="polite"></p>
+    </main>
+    <script src="error.js"></script>
+  </body>
+</html>

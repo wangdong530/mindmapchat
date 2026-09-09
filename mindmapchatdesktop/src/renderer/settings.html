@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self'; script-src 'self';" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindmapChat 连接设置</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="settings-shell">
+      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+      <h1>连接 MindmapChat</h1>
+      <p class="lead">设置桌面客户端要连接的 MindmapChat 服务地址。</p>
+      <form id="settings-form">
+        <label for="server-url">服务器地址</label>
+        <input id="server-url" name="server-url" type="url" required autocomplete="url" spellcheck="false" placeholder="https://mindmapchat.example.com" />
+        <p id="message" class="message" aria-live="polite"></p>
+        <div class="actions">
+          <button id="reset-button" class="button secondary" type="button">恢复默认</button>
+          <div class="action-spacer"></div>
+          <button id="cancel-button" class="button secondary" type="button">取消</button>
+          <button id="save-button" class="button primary" type="submit">保存并连接</button>
+        </div>
+      </form>
+      <p id="version" class="version"></p>
+    </main>
+    <script src="settings.js"></script>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+{
+  "name": "mindmapchat-desktop",
+  "version": "1.0.244",
+  "description": "MindmapChat cross-platform desktop client",
+  "private": true,
+  "type": "module",
+  "main": "src/main.mjs",
+  "author": "MindmapChat",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron .",
+    "check": "node --check src/main.mjs && node --check src/preload.mjs && node --check src/renderer/settings.js && node --check src/renderer/error.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^43.2.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.mindmapchat.desktop",
+    "productName": "MindmapChat Desktop",
+    "icon": "build/icon.png",
+    "asar": true,
+    "directories": { "output": "release" },
+    "files": ["src/**/*", "package.json"],
+    "mac": {
+      "icon": "build/icon.icns",
+      "category": "public.app-category.productivity",
+      "target": ["dmg", "zip"]
+    },
+    "win": { "target": ["nsis"] },
+    "linux": {
+      "category": "Office",
+      "target": ["AppImage"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  }
+}

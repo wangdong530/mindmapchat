@@ -1,0 +1,45 @@
+{
+  "name": "mindmapchat",
+  "private": false,
+  "version": "1.0.245",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "dev:server": "node server.js",
+    "dev:all": "concurrently \"npm run dev:server\" \"npm run dev\"",
+    "desktop:install": "npm --prefix mindmapchatdesktop install",
+    "desktop:start": "npm --prefix mindmapchatdesktop start",
+    "desktop:pack": "npm --prefix mindmapchatdesktop run pack",
+    "desktop:dist": "npm --prefix mindmapchatdesktop run dist",
+    "build": "tsc -b && vite build",
+    "test:personality": "node --test tests/personality-split*.test.mjs",
+    "preview": "vite preview",
+    "start": "node server-prod.js"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.1.0",
+    "antd": "^5.28.1",
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1",
+    "highlight.js": "^11.11.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.22.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.18.1",
+    "rehype-highlight": "^7.0.2",
+    "rehype-raw": "^7.0.0",
+    "remark-gfm": "^4.0.1",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.2.4",
+    "typescript": "^7.0.2",
+    "vite": "^6.4.3"
+  }
+}

@@ -1,0 +1,32 @@
+# 依赖与构建产物（体积大，不入库）
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# 环境变量与密钥（含真实凭据，禁止入库）
+.env
+.env.*
+!.env.example
+
+# 第三方浏览器二进制（Chrome for Testing，体积大，不入库）
+chrome/
+
+# 桌面端构建产物
+mindmapchatdesktop/release/
+
+# IDE 配置
+.idea/
+*.iml
+
+# 本地技能与凭据（含 git 提交凭据、内部部署脚本与服务器信息，禁止推送到公开仓库）
+.codebuddy/
+.agents/
+
+# 日志与系统文件
+*.log
+.DS_Store
+npm-debug.log*
+*.tar.gz
+*.tgz
+

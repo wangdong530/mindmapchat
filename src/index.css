@@ -1,0 +1,320 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  /* 移动端键盘弹出时的动态视口高度 */
+  height: 100dvh;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* 移动端输入框最小字号 16px，防止 iOS Safari 聚焦时自动放大页面 */
+input, textarea {
+  font-size: 16px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* 角色圆圈：3D 球体旋转 — 鼠标拖拽交互 */
+.sphere-container {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.sphere-container:active {
+  cursor: grabbing;
+}
+
+/* Doubao Chat Tree styles */
+.db-menu-item:hover {
+  background: #f3f4f6;
+}
+
+.db-history-item:hover {
+  background: #f3f4f6;
+}
+
+.db-suggestion-btn:hover {
+  border-color: #d1d5db !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+  transform: translateY(-1px);
+}
+
+.ant-input:focus {
+  box-shadow: none !important;
+}
+
+.ant-input-textarea:focus {
+  box-shadow: none !important;
+}
+
+/* Layout sider transition */
+.ant-layout-sider {
+  transition: all 0.2s;
+}
+
+/* Smooth scrollbar for sidebar */
+.ant-layout-sider > div:first-child {
+  scrollbar-width: thin;
+}
+
+/* ========== Markdown 渲染样式 ========== */
+.markdown-content {
+  font-size: 12px;
+  line-height: 1.35;
+  color: #1f2937;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+  margin: 2px 0 1px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.markdown-content h1 { font-size: 1.1em; }
+.markdown-content h2 { font-size: 1.02em; border-bottom: 1px solid #e5e7eb; padding-bottom: 2px; }
+.markdown-content h3 { font-size: 0.98em; }
+
+.markdown-content p {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.markdown-content ul,
+.markdown-content ol {
+  margin: 1px 0;
+  padding-left: 18px;
+}
+
+.markdown-content li {
+  margin: 0;
+  line-height: 1.35;
+}
+
+/* react-markdown 常把列表项内容包成 <p>，去掉这些段落的额外间距 */
+.markdown-content li p,
+.markdown-content li > p:first-child,
+.markdown-content li > p:last-child {
+  margin: 0;
+  line-height: 1.35;
+}
+
+.markdown-content table {
+  border-collapse: collapse;
+  margin: 3px 0;
+  width: 100%;
+  font-size: 11px;
+}
+
+.markdown-content th,
+.markdown-content td {
+  border: 1px solid #e5e7eb;
+  padding: 3px 6px;
+  text-align: left;
+}
+
+.markdown-content th {
+  background: #f8fafc;
+  font-weight: 600;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #d1d5db;
+  padding-left: 8px;
+  margin: 3px 0;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+.markdown-content pre {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 6px 8px;
+  margin: 2px 0;
+  overflow-x: auto;
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.markdown-content pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.markdown-content .md-inline-code,
+.markdown-content code:not(pre code) {
+  background: #f1f5f9;
+  color: #e11d48;
+  padding: 1px 4px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', monospace;
+}
+
+.markdown-content hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 4px 0;
+}
+
+.markdown-content a {
+  color: #6366f1;
+  text-decoration: none;
+}
+.markdown-content a:hover {
+  text-decoration: underline;
+}
+
+.markdown-content img {
+  max-width: 100%;
+  border-radius: 6px;
+}
+
+.markdown-content strong {
+  font-weight: 600;
+}
+
+/* 兜底：隐藏残留的空段落 */
+.markdown-content p:empty { display: none; }
+
+/* ========== 移动端响应式全局调整 ========== */
+@media (max-width: 1024px) {
+  /* 移动端/平板默认不显示思维导图区域，用户点击按钮后才显示 */
+  .mindmap-container--mobile-hidden {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .ant-modal {
+    max-width: calc(100vw - 32px) !important;
+  }
+  .ant-drawer-content-wrapper {
+    max-width: calc(100vw - 16px) !important;
+  }
+  .ant-message {
+    max-width: 90vw;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 1024px) {
+  .ant-modal {
+    max-width: 92vw !important;
+  }
+  .ant-drawer-content-wrapper {
+    max-width: 88vw !important;
+  }
+}
+
+/* ========== 导出 PDF（浏览器打印方案） ========== */
+/* 平时打印区移出视口并隐藏；打印时仅显示该区域 */
+.pdf-print-area {
+  position: absolute;
+  left: -99999px;
+  top: 0;
+  width: 800px;
+  visibility: hidden;
+}
+
+@media print {
+  body * { visibility: hidden !important; }
+  .pdf-print-area,
+  .pdf-print-area * { visibility: visible !important; }
+
+  .pdf-print-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    padding: 0 12mm !important;
+    margin: 0 !important;
+    background: #fff !important;
+    visibility: visible !important;
+    color: #1f2937;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* 标题区 */
+  .pdf-head {
+    border-bottom: 2px solid #6366f1;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+  }
+  .pdf-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: #111827;
+  }
+  .pdf-meta {
+    font-size: 12px;
+    color: #6b7280;
+  }
+
+  /* 消息卡片 */
+  .pdf-msg {
+    margin-bottom: 14px;
+    page-break-inside: avoid;
+  }
+  .pdf-msg__role {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .pdf-msg--user .pdf-msg__role { color: #6366f1; text-align: right; }
+  .pdf-msg--ai .pdf-msg__role { color: #0ea5e9; text-align: left; }
+
+  .pdf-msg__body {
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .pdf-msg--user .pdf-msg__body {
+    background: #eef2ff;
+    margin-left: 64px;
+  }
+  .pdf-msg--ai .pdf-msg__body {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    margin-right: 64px;
+  }
+  .pdf-msg__text {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* 保留 Markdown 代码块 / 引用 / 表格的配色 */
+  .pdf-print-area pre,
+  .pdf-print-area code,
+  .pdf-print-area blockquote,
+  .pdf-print-area table,
+  .pdf-print-area th,
+  .pdf-print-area td {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  @page { margin: 12mm; }
+}
