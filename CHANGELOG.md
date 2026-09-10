@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v1.0.246
+- 新增「人物画像」：每次提问（普通对话 / 角色会话 / 人格分裂）由后台队列异步做兴趣归类（单选 1 条树内主路径 + 最多 5 个关键词），只在库里保存 ≤60 字截断片段与分类结果，不保存提问原文
+- 新增兴趣分类树（13 个一级 + 二级/三级，随迁移幂等写入种子）与管理员维护界面（新增 / 改名 / 排序 / 停用 / 删除叶子）
+- 新增画像页 `/profile`（单入口，管理员顶部可切用户）：LLM 兴趣自画像文案、一级兴趣环形分布 + 二级细分、近 7/30 天趋势、关键词云 / 潜在话题、按分类穿透下钻到截断片段
+- 隐私控制：账户级「人物画像采集」总开关（设置面板 + 画像页，默认开）与会话级「参与人物画像采集」开关（对话设置，默认开）；关闭不回溯历史；删除会话时同步清理画像样本；连续失败样本保留但标记不参与统计
+- 技术说明：`db.js`/`init-db.js`/`server-prod.js` 增加 `users.profile_enabled`、`conversations.profile_enabled`、`profile_taxonomy`、`query_classifications`、`profile_narratives` 幂等迁移；新增 `profile-db.js`（数据层）、`profile-classifier.js`（串行分类队列，90s 相似去重）、`profile-routes.js`（画像聚合与树管理 API）
+
 ## v1.0.245
 - 开源与安全加固：`chat-proxy.js`、`db.js`、`init-db.js`、`server-prod.js` 中的硬编码模型 API Key、数据库密码与 JWT 密钥全部改为从环境变量注入，`JWT_SECRET` 缺失时服务拒绝启动，并补充 `.env.example` 说明
 - 移除 LearnWords 与 AILearnWordsDemo 页面及路由，删除不再使用的 `@xyflow/react`、`d3-force`、`markdown-it` 依赖，清理 `useStore` 遗留聊天历史状态与 `db.js` 废弃接口

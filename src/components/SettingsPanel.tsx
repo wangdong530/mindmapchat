@@ -32,13 +32,44 @@ export default function SettingsPanel() {
   const user = getUser()
   const [nickname, setNickname] = useState(user?.nickname || user?.username || '')
   const [saving, setSaving] = useState(false)
+  const [profileEnabled, setProfileEnabled] = useState<boolean>(true)
 
   useEffect(() => {
     if (settingsOpen) {
       const u = getUser()
       setNickname(u?.nickname || u?.username || '')
+      // 读取账户级画像采集开关
+      fetch('/api/me', { headers: { Authorization: `Bearer ${localStorage.getItem('thinkchat_token') || ''}` } })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => { if (data) setProfileEnabled(data.profileEnabled !== false) })
+        .catch(() => { /* 保持默认开启 */ })
     }
   }, [settingsOpen])
+
+  const handleToggleProfile = async (enabled: boolean) => {
+    const token = localStorage.getItem('thinkchat_token')
+    if (!token) return
+    const prev = profileEnabled
+    setProfileEnabled(enabled)
+    try {
+      const res = await fetch('/api/me/profile-enabled', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ enabled }),
+      })
+      if (!res.ok) {
+        setProfileEnabled(prev)
+        const data = await res.json().catch(() => null)
+        message.error(data?.error || '操作失败')
+        return
+      }
+      message.success(enabled ? '已开启人物画像采集' : '已暂停人物画像采集')
+      logSettings('update_profile_enabled', { enabled })
+    } catch {
+      setProfileEnabled(prev)
+      message.error('网络错误')
+    }
+  }
 
   const handleSaveNickname = async () => {
     const token = localStorage.getItem('thinkchat_token')
@@ -114,6 +145,17 @@ export default function SettingsPanel() {
           />
           <Text type="secondary" style={{ fontSize: 11 }}>
             用户名：{user?.username || ''}（不可修改）
+          </Text>
+        </Flex>
+
+        {/* 人物画像采集（账户级总开关） */}
+        <Flex vertical gap={8} style={{ background: '#f9fafb', borderRadius: 10, padding: '10px 12px' }}>
+          <Flex align="center" justify="space-between" gap={8}>
+            <Text style={{ fontSize: 13, fontWeight: 600 }}>人物画像采集</Text>
+            <Switch checked={profileEnabled} onChange={handleToggleProfile} />
+          </Flex>
+          <Text type="secondary" style={{ fontSize: 12, lineHeight: 1.6 }}>
+            开启后，你的每次提问会被 AI 归类成「人物画像」（侧边栏菜单）。只保存截断片段与分类结果，不保存提问原文。关闭后不再采集新提问，历史画像保留。
           </Text>
         </Flex>
 

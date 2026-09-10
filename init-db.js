@@ -1,4 +1,5 @@
 import pg from 'pg'
+import { ensureProfileSchema } from './profile-db.js'
 
 const { Pool } = pg
 
@@ -227,6 +228,10 @@ async function init() {
   } else {
     console.log('[SKIP] 未配置 MINDMAPCHAT_ADMIN_USERNAME，不提升任何管理员')
   }
+
+  // 人物画像：画像采集开关列、分类树与提问样本表、种子（幂等）
+  await ensureProfileSchema(dbPool)
+  console.log('[OK] profile feature tables & taxonomy seeds')
 
   // 验证
   const { rows: allTables } = await dbPool.query(

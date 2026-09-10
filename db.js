@@ -244,7 +244,7 @@ export async function createUser(username, passwordHash) {
 
 export async function findUserByUsername(username) {
   const { rows } = await pool.query(
-    'SELECT id, username, nickname, password_hash, is_admin, created_at FROM users WHERE username = $1',
+    'SELECT id, username, nickname, password_hash, is_admin, profile_enabled, created_at FROM users WHERE username = $1',
     [username],
   )
   return rows[0] || null
@@ -294,6 +294,7 @@ export async function getConversations(userId) {
             conv_thinking AS "convThinking", conv_reasoning AS "convReasoning",
             conv_group AS "convGroup", is_pinned AS "pinned",
             greeting, role_template_id AS "roleTemplateId",
+            profile_enabled AS "profileEnabled",
             lock_owner AS "lockOwner", lock_label AS "lockLabel", lock_expires_at AS "lockExpiresAt"
      FROM conversations WHERE user_id = $1 ORDER BY is_pinned DESC, updated_at DESC`,
     [userId],
@@ -309,6 +310,7 @@ export async function getConversationMeta(conversationId) {
             conv_system AS "convSystem", conv_temperature AS "convTemperature",
             conv_thinking AS "convThinking", conv_reasoning AS "convReasoning",
             greeting, role_template_id AS "roleTemplateId",
+            profile_enabled AS "profileEnabled",
             lock_owner AS "lockOwner", lock_label AS "lockLabel", lock_expires_at AS "lockExpiresAt"
      FROM conversations WHERE id = $1`,
     [conversationId],
@@ -446,7 +448,7 @@ export async function getOrCreateRoleConversation({ conversationId, panelId, use
   }
 }
 
-export async function updateConversation(id, { title, background, convSystem, convTemperature, convThinking, convReasoning, convGroup, greeting, pinned } = {}) {
+export async function updateConversation(id, { title, background, convSystem, convTemperature, convThinking, convReasoning, convGroup, greeting, pinned, profileEnabled } = {}) {
   const fields = []
   const values = []
   let idx = 1
@@ -459,6 +461,7 @@ export async function updateConversation(id, { title, background, convSystem, co
   if (convGroup !== undefined) { fields.push(`conv_group = $${idx++}`); values.push(convGroup ?? null) }
   if (greeting !== undefined) { fields.push(`greeting = $${idx++}`); values.push(greeting ?? '') }
   if (pinned !== undefined) { fields.push(`is_pinned = $${idx++}`); values.push(pinned) }
+  if (profileEnabled !== undefined) { fields.push(`profile_enabled = $${idx++}`); values.push(!!profileEnabled) }
   if (fields.length === 0) return
   values.push(id)
   await pool.query(
@@ -468,7 +471,8 @@ export async function updateConversation(id, { title, background, convSystem, co
 }
 
 export async function deleteConversation(id) {
-  // 先删 messages，再删 panels，最后删 conversation
+  // 先删画像样本（人物画像不回链会话，但随会话删除清理），再删 messages，再删 panels，最后删 conversation
+  await pool.query('DELETE FROM query_classifications WHERE conversation_id = $1', [id])
   await pool.query(
     'DELETE FROM messages WHERE panel_id IN (SELECT id FROM panels WHERE conversation_id = $1)',
     [id],

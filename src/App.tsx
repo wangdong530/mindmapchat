@@ -7,6 +7,7 @@ import LoginPage, { isAuthenticated } from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import UserQuestionsPage from './pages/UserQuestionsPage'
 import PersonalitySplitPage from './pages/PersonalitySplit'
+import ProfilePage from './pages/ProfilePage'
 import AppErrorBoundary from './components/AppErrorBoundary'
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/mindmap" element={<Navigate to="/" replace />} />
           <Route path="/user-questions" element={<RequireAuth><UserQuestionsPage /></RequireAuth>} />
           <Route path="/personality-split" element={<RequireAuth><PersonalitySplitPage /></RequireAuth>} />
+          <Route path="/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
         </Routes>
       </AppErrorBoundary>
     </ConfigProvider>

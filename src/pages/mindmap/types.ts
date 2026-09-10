@@ -48,6 +48,8 @@ export interface Conversation {
   // 分组与置顶
   group?: string
   pinned?: boolean
+  // 会话级画像采集开关（默认开；未定义按开处理）
+  profileEnabled?: boolean
   // 来源角色模板；服务端保证同一用户与模板仅关联一个会话
   roleTemplateId?: string
 }

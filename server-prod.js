@@ -18,6 +18,9 @@ import pool, {
   getRoleTemplates, getAllRoleTemplates, createRoleTemplate, updateRoleTemplate, deleteRoleTemplate,
   ADMIN_USERNAMES, grantAdminByUsername,
 } from './db.js'
+import * as profileDb from './profile-db.js'
+import { enqueueQuestionCapture } from './profile-classifier.js'
+import { registerProfileRoutes } from './profile-routes.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -183,7 +186,7 @@ app.get('/api/me', authMiddleware, async (req, res, next) => {
   try {
     const user = await findUserByUsername(req.user.username)
     if (!user) return res.status(404).json({ error: '用户不存在' })
-    res.json({ id: user.id, username: user.username, nickname: user.nickname, isAdmin: !!user.is_admin })
+    res.json({ id: user.id, username: user.username, nickname: user.nickname, isAdmin: !!user.is_admin, profileEnabled: user.profile_enabled !== false })
   } catch (err) {
     next(err)
   }
@@ -258,7 +261,7 @@ app.post('/api/conversations', authMiddleware, async (req, res, next) => {
 // 更新会话标题
 app.put('/api/conversations/:id', authMiddleware, async (req, res, next) => {
   try {
-    const { title, background, convSystem, convTemperature, convThinking, convReasoning, group, greeting, pinned } = req.body
+    const { title, background, convSystem, convTemperature, convThinking, convReasoning, group, greeting, pinned, profileEnabled } = req.body
     await updateConversation(req.params.id, {
       title,
       background,
@@ -269,6 +272,7 @@ app.put('/api/conversations/:id', authMiddleware, async (req, res, next) => {
       convGroup: group,
       greeting,
       pinned,
+      profileEnabled,
     })
     res.json({ ok: true })
     opLog(req, 'update_conversation', 'conversation', { convId: req.params.id, title })
@@ -672,6 +676,8 @@ app.post('/api/personality-split', authMiddleware, async (req, res, next) => {
 
   try {
     const { prompt, templateIds } = validated
+    // 人物画像采集：人格分裂里问的内容同样计入该用户兴趣画像（仅截断片段/分类，不存原文）
+    try { enqueueQuestionCapture({ userId: req.user.id, source: 'personality', text: prompt }) } catch { /* 不影响主流程 */ }
     const templates = await getRoleTemplates()
     const templateMap = new Map(templates.map(template => [template.id, template]))
     const selectedTemplates = templateIds.map(id => templateMap.get(id)).filter(Boolean)
@@ -901,8 +907,20 @@ const chat = createChatHandler({
 app.post('/api/chat', authMiddleware, (req, res, next) => {
   // 记录 AI 请求日志
   opLog(req, 'chat_request', 'chat', { provider: req.body?.provider, model: req.body?.model })
+  // 人物画像采集：仅当前端带了会话 ID 且最近一条为用户文字提问时异步归类（不阻塞回复）
+  try {
+    const msgs = Array.isArray(req.body?.messages) ? req.body.messages : []
+    const lastUser = [...msgs].reverse().find(m => m && m.role === 'user')
+    const text = typeof lastUser?.content === 'string' ? lastUser.content.trim() : ''
+    if (req.body?.convId && text) {
+      enqueueQuestionCapture({ userId: req.user.id, conversationId: req.body.convId, source: 'chat', text })
+    }
+  } catch { /* 采集失败不影响提问主流程 */ }
   chat(req, res).catch(next)
 })
+
+// ===================== 人物画像接口 =====================
+registerProfileRoutes(app, { authMiddleware, requireAdmin, opLog })
 
 // ===================== 操作日志查询接口（管理员） =====================
 
@@ -948,6 +966,13 @@ async function start() {
   try {
     await pool.query('SELECT 1')
     console.log('[DB] PostgreSQL connected')
+    // 人物画像：建表/加列/种子（幂等）
+    try {
+      await profileDb.ensureProfileSchema(pool)
+      console.log('[DB] profile schema ready')
+    } catch (e) {
+      console.error('[DB] profile schema init failed:', e.message)
+    }
     // 旧库兼容：确保 conversations 表存在 background 列
     try {
       await pool.query('ALTER TABLE conversations ADD COLUMN IF NOT EXISTS background VARCHAR(512)')

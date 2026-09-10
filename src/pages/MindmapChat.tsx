@@ -55,6 +55,7 @@ import {
   DeleteOutlined,
   FileTextOutlined,
   BulbOutlined,
+  IdcardOutlined,
 } from '@ant-design/icons'
 import zhCN from 'antd/locale/zh_CN'
 import { ModelConfigModal, loadConfig, type ModelConfig } from '../components/ModelConfigModal'
@@ -99,6 +100,7 @@ export default function MindmapChatPage() {
   const [settingsConvReasoning, setSettingsConvReasoning] = useState<'high' | 'max' | 'low'>('high')
   const [settingsGroup, setSettingsGroup] = useState('')
   const [settingsGreeting, setSettingsGreeting] = useState('')
+  const [settingsProfileEnabled, setSettingsProfileEnabled] = useState(true)
   const [isMindmapVisible, setIsMindmapVisible] = useState(false)
 
   // 移动端/平板强制关闭思维导图（双重保险，配合 CSS 媒体查询）
@@ -845,6 +847,7 @@ export default function MindmapChatPage() {
       headers: authHeaders(),
       body: JSON.stringify({
         messages: finalMessages,
+        convId: activeId,
         stream: mc.stream,
         provider: mc.provider,
         apiKey: mc.apiKey,
@@ -1529,6 +1532,7 @@ export default function MindmapChatPage() {
     setSettingsConvReasoning(conv.convReasoning || 'high')
     setSettingsGroup(conv.group || '')
     setSettingsGreeting(conv.greeting || '')
+    setSettingsProfileEnabled(conv.profileEnabled ?? true)
     setConvSettingsVisible(true)
   }
 
@@ -1543,14 +1547,15 @@ export default function MindmapChatPage() {
     const convReasoning = isAdmin ? settingsConvReasoning : undefined
     const group = settingsGroup.trim() || undefined
     const greeting = settingsGreeting.trim() || undefined
+    const profileEnabled = settingsProfileEnabled
     setConversations((prev) => prev.map((c) => (c.id === settingsConvId
-      ? { ...c, title, background, convSystem, convTemperature, convThinking, convReasoning, group, greeting }
+      ? { ...c, title, background, convSystem, convTemperature, convThinking, convReasoning, group, greeting, profileEnabled }
       : c)))
     try {
       await fetch(`/api/conversations/${settingsConvId}`, {
         method: 'PUT',
         headers: authHeaders(),
-        body: JSON.stringify({ title, background, convSystem, convTemperature, convThinking, convReasoning, group, greeting }),
+        body: JSON.stringify({ title, background, convSystem, convTemperature, convThinking, convReasoning, group, greeting, profileEnabled }),
       })
     } catch {
       message.error('保存对话设置失败')
@@ -1696,6 +1701,12 @@ export default function MindmapChatPage() {
               onClick={() => navigate('/personality-split')}
               style={{ width: '100%', marginBottom: 8, textAlign: 'left', height: 36, borderRadius: 8, color: '#6b7280', fontSize: 13 }}>
               人格分裂
+            </Button>
+
+            <Button type="text" icon={<IdcardOutlined />}
+              onClick={() => navigate('/profile')}
+              style={{ width: '100%', marginBottom: 8, textAlign: 'left', height: 36, borderRadius: 8, color: '#6b7280', fontSize: 13 }}>
+              人物画像
             </Button>
 
             {isAdmin && (
@@ -1856,6 +1867,18 @@ export default function MindmapChatPage() {
                 autoSize={{ minRows: 2, maxRows: 4 }}
                 maxLength={2000}
               />
+            </div>
+
+            <div style={{ background: '#f9fafb', borderRadius: 10, padding: '12px 14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>参与人物画像采集</div>
+                  <div style={{ fontSize: 12, color: '#9ca3af', marginTop: 3 }}>
+                    开启后，本会话中的提问会被异步归类为你的人物画像。只保存截断片段与分类结果，不保存提问原文。
+                  </div>
+                </div>
+                <Switch checked={settingsProfileEnabled} onChange={setSettingsProfileEnabled} />
+              </div>
             </div>
 
             {isAdmin && (
@@ -2075,6 +2098,12 @@ export default function MindmapChatPage() {
                 onClick={() => { navigate('/personality-split'); setMobileDrawerOpen(false) }}
                 style={{ width: '100%', marginBottom: 8, textAlign: 'left', height: 36, borderRadius: 8, color: '#6b7280', fontSize: 13 }}>
                 人格分裂
+              </Button>
+
+              <Button type="text" icon={<IdcardOutlined />}
+                onClick={() => { navigate('/profile'); setMobileDrawerOpen(false) }}
+                style={{ width: '100%', marginBottom: 8, textAlign: 'left', height: 36, borderRadius: 8, color: '#6b7280', fontSize: 13 }}>
+                人物画像
               </Button>
 
               {isAdmin && (
